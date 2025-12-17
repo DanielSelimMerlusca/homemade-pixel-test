@@ -1,52 +1,50 @@
-(function() {
+(function () {
 
-  
+  // 1. Visitor ID (persistent per browser)
   function getVisitorId() {
     const existing = localStorage.getItem("homemade_visitor_id");
     if (existing) return existing;
 
-    const newId = "hm_" + Math.random().toString(36).substring(2,10);
+    const newId = "hm_" + Math.random().toString(36).substring(2, 10);
     localStorage.setItem("homemade_visitor_id", newId);
     return newId;
   }
 
   const visitorId = getVisitorId();
 
-  
-  function sendEvent() {
-    fetch("https://webhook.site/4ce292bc-3284-422a-aefd-76c2be65824b", { 
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        event_type: "page_view",
-        visitor_id: visitorId,
-        timestamp: Date.now(),
-        url: window.location.href,
-        referrer: document.referrer
-      })
-    });
+  // 2. Fire-and-forget sender (NO CORS issues)
+  function send(payload) {
+    navigator.sendBeacon(
+      "https://webhook.site/YOUR_UUID_HERE",
+      JSON.stringify(payload)
+    );
   }
 
-  
-  sendEvent();
-  
-  
-  document.addEventListener("click", function(e) {
+  // 3. PAGE VIEW EVENT
+  send({
+    event_type: "page_view",
+    visitor_id: visitorId,
+    timestamp: Date.now(),
+    url: window.location.href,
+    path: window.location.pathname + window.location.search,
+    referrer: document.referrer
+  });
+
+  // 4. SPOTIFY CLICK EVENT
+  document.addEventListener("click", function (e) {
     var link = e.target.closest("a");
     if (!link) return;
 
     if (link.href && link.href.includes("spotify")) {
-      fetch("https://webhook.site/4ce292bc-3284-422a-aefd-76c2be65824b", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          event_type: "spotify_click",
-          visitor_id: visitorId,
-          timestamp: Date.now(),
-          url: window.location.href,
-          target: link.href
-        })
+      send({
+        event_type: "spotify_click",
+        visitor_id: visitorId,
+        timestamp: Date.now(),
+        url: window.location.href,
+        path: window.location.pathname + window.location.search,
+        target: link.href
       });
     }
   });
+
 })();
