@@ -14,7 +14,7 @@
 
   // Send to webhook (temporary)
   function sendEvent() {
-    fetch("https://webhook.site", { // will replace with full URL next step
+    fetch("https://webhook.site/4ce292bc-3284-422a-aefd-76c2be65824b", { 
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
